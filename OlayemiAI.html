@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Olayemi AI — Your Personal Intelligent Assistant</title>
+<meta name="description" content="Olayemi AI is your personal intelligent assistant for chat, web search, writing and more. Created by Ayeyemi Mubarak Olayemi.">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--ink:#0D0D14;--ink2:#3B3B52;--muted:#8B8BA0;--bg:#FAFAF8;--white:#FFFFFF;--blue:#1A56DB;--blue2:#1E40AF;--blue-pale:#EFF6FF;--blue-light:#BFDBFE;--border:#E5E5EC;}
+html{scroll-behavior:smooth;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden;}
+.page{display:none;min-height:100vh;}
+.page.active{display:block;}
+#page-chat{min-height:unset;}
+#page-chat.active{display:flex;height:100vh;overflow:hidden;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:18px 60px;background:rgba(250,250,248,0.94);backdrop-filter:blur(20px);border-bottom:1px solid rgba(229,229,236,0.5);}
+.nl{display:flex;align-items:center;gap:10px;cursor:pointer;}
+.ni{width:38px;height:38px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(26,86,219,0.3);flex-shrink:0;}
+.nt{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--ink);}
+.nt span{color:var(--blue);}
+.nlinks{display:flex;align-items:center;gap:32px;}
+.nlinks a{text-decoration:none;font-size:14px;font-weight:500;color:var(--ink2);cursor:pointer;transition:color .2s;}
+.nlinks a:hover{color:var(--blue);}
+.ncta{background:var(--blue);color:white;padding:10px 24px;border-radius:100px;font-size:14px;font-weight:600;cursor:pointer;border:none;font-family:'Outfit',sans-serif;box-shadow:0 4px 16px rgba(26,86,219,0.3);transition:all .2s;}
+.ncta:hover{background:var(--blue2);}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;position:relative;overflow:hidden;}
+.hbg{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(26,86,219,0.09) 0%,transparent 70%);}
+.hgrid{position:absolute;inset:0;z-index:0;background-image:linear-gradient(rgba(26,86,219,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(26,86,219,0.04) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 20%,transparent 80%);}
+.hc{position:relative;z-index:1;max-width:760px;}
+.badge{display:inline-flex;align-items:center;gap:7px;background:var(--blue-pale);border:1px solid var(--blue-light);color:var(--blue);font-size:12.5px;font-weight:600;padding:6px 16px;border-radius:100px;margin-bottom:32px;animation:fu .6s ease both;}
+.bd{width:6px;height:6px;border-radius:50%;background:var(--blue);animation:blink 1.5s ease infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:72px;font-weight:700;color:var(--ink);line-height:1.05;margin-bottom:24px;animation:fu .6s .1s ease both;}
+.hero h1 em{color:var(--blue);font-style:italic;}
+.hsub{font-size:17px;color:var(--ink2);line-height:1.75;max-width:520px;margin:0 auto 44px;font-weight:300;animation:fu .6s .2s ease both;}
+.hbtns{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;animation:fu .6s .3s ease both;}
+.bp{display:inline-flex;align-items:center;gap:8px;background:var(--blue);color:white;padding:14px 32px;border-radius:100px;font-size:15px;font-weight:600;border:none;cursor:pointer;font-family:'Outfit',sans-serif;box-shadow:0 6px 24px rgba(26,86,219,0.35);transition:all .2s;}
+.bp:hover{background:var(--blue2);transform:translateY(-2px);}
+.bs{display:inline-flex;align-items:center;gap:8px;background:var(--white);color:var(--ink);padding:14px 32px;border-radius:100px;font-size:15px;font-weight:600;border:1.5px solid var(--border);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;}
+.bs:hover{border-color:var(--blue);color:var(--blue);transform:translateY(-2px);}
+.prev{margin-top:64px;position:relative;z-index:1;animation:fu .7s .4s ease both;max-width:820px;width:100%;}
+.pbar{background:#E8E8F0;border-radius:12px 12px 0 0;padding:12px 18px;display:flex;align-items:center;gap:8px;}
+.pd{width:12px;height:12px;border-radius:50%;}
+.pd:nth-child(1){background:#FF5F57;}.pd:nth-child(2){background:#FEBC2E;}.pd:nth-child(3){background:#28C840;}
+.purl{flex:1;background:white;border-radius:6px;padding:5px 12px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;}
+.pbody{background:var(--white);border:1px solid var(--border);border-top:none;border-radius:0 0 16px 16px;padding:28px;box-shadow:0 20px 60px rgba(13,13,20,0.1);display:flex;flex-direction:column;gap:16px;}
+.pm{display:flex;gap:12px;align-items:flex-start;}.pm.u{flex-direction:row-reverse;}
+.pav{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+.pav.ai{background:var(--blue);color:white;}.pav.u{background:linear-gradient(135deg,#1A56DB,#7C3AED);color:white;}
+.pb{padding:11px 16px;border-radius:14px;font-size:13.5px;line-height:1.6;max-width:460px;text-align:left;}
+.pb.ai{background:var(--bg);border:1px solid var(--border);}.pb.u{background:var(--blue);color:white;}
+@keyframes fu{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+/* SECTIONS */
+.sec{padding:100px 60px;max-width:1200px;margin:0 auto;}
+.stag{display:inline-flex;align-items:center;gap:6px;background:var(--blue-pale);border:1px solid var(--blue-light);color:var(--blue);font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 14px;border-radius:100px;margin-bottom:20px;}
+.stit{font-family:'Cormorant Garamond',serif;font-size:46px;font-weight:700;color:var(--ink);line-height:1.1;margin-bottom:14px;}
+.stit em{color:var(--blue);font-style:italic;}
+.ssub{font-size:16px;color:var(--ink2);line-height:1.7;max-width:480px;font-weight:300;margin-bottom:60px;}
+.fg{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.fc{background:var(--white);border:1px solid var(--border);border-radius:20px;padding:32px;transition:all .25s;position:relative;overflow:hidden;}
+.fc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),#60A5FA);opacity:0;transition:opacity .25s;}
+.fc:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(26,86,219,0.1);border-color:var(--blue-light);}
+.fc:hover::before{opacity:1;}
+.fi{width:48px;height:48px;border-radius:14px;background:var(--blue-pale);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:20px;}
+.ftt{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:10px;}
+.fd{font-size:14px;color:var(--ink2);line-height:1.7;font-weight:300;}
+
+/* STEPS */
+.steps-sec{padding:100px 60px;max-width:1200px;margin:0 auto;text-align:center;}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:60px;position:relative;}
+.steps::before{content:'';position:absolute;top:32px;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,var(--blue-light),transparent);}
+.sn{width:64px;height:64px;border-radius:50%;background:var(--blue);color:white;font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 8px 24px rgba(26,86,219,.3);}
+.st{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:10px;}
+.sd{font-size:14px;color:var(--ink2);line-height:1.7;font-weight:300;}
+
+/* FOUNDER STRIP */
+.founder-strip{padding:100px 60px;background:var(--ink);position:relative;overflow:hidden;}
+.fsbg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 100% 50%,rgba(26,86,219,0.15) 0%,transparent 70%);}
+.fsinner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;position:relative;z-index:1;}
+.fslabel{display:inline-flex;align-items:center;gap:6px;background:rgba(26,86,219,.2);border:1px solid rgba(26,86,219,.4);color:#93C5FD;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 14px;border-radius:100px;margin-bottom:24px;}
+.founder-strip h2{font-family:'Cormorant Garamond',serif;font-size:46px;font-weight:700;color:white;line-height:1.1;margin-bottom:20px;}
+.founder-strip h2 em{color:#60A5FA;font-style:italic;}
+.fsbio{font-size:16px;color:#A0A0BC;line-height:1.8;font-weight:300;margin-bottom:32px;}
+.fsbtn{display:inline-flex;align-items:center;gap:8px;background:var(--blue);color:white;padding:13px 28px;border-radius:100px;font-size:14px;font-weight:600;border:none;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;}
+.fsbtn:hover{background:#1d4ed8;}
+.fscard{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:36px;}
+.fsav{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#7C3AED);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;color:white;margin-bottom:20px;box-shadow:0 8px 32px rgba(26,86,219,.4);}
+.fsname{font-size:20px;font-weight:700;color:white;margin-bottom:6px;}
+.fsrole{font-size:13px;color:#93C5FD;font-weight:500;margin-bottom:20px;}
+.fsdiv{height:1px;background:rgba(255,255,255,.1);margin-bottom:20px;}
+.fsstat{display:flex;justify-content:space-between;margin-bottom:12px;}
+.fssl{font-size:13px;color:#A0A0BC;}.fssv{font-size:13px;color:white;font-weight:600;}
+
+/* CTA */
+.cta-sec{padding:100px 60px;text-align:center;background:linear-gradient(135deg,var(--blue),#1e3a8a);position:relative;overflow:hidden;}
+.cta-sec::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 70% at 50% 50%,rgba(255,255,255,.06),transparent 70%);}
+.cta-sec h2{font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:700;color:white;margin-bottom:18px;position:relative;z-index:1;}
+.cta-sec p{font-size:17px;color:rgba(255,255,255,.75);margin-bottom:40px;font-weight:300;position:relative;z-index:1;}
+.ctabtn{display:inline-flex;align-items:center;gap:8px;background:white;color:var(--blue);padding:16px 40px;border-radius:100px;font-size:16px;font-weight:700;border:none;cursor:pointer;font-family:'Outfit',sans-serif;box-shadow:0 8px 32px rgba(0,0,0,.2);transition:all .2s;position:relative;z-index:1;}
+.ctabtn:hover{transform:translateY(-2px);}
+
+/* FOOTER */
+footer{background:var(--ink);padding:50px 60px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;}
+.flogo{display:flex;align-items:center;gap:10px;cursor:pointer;}
+.flogt{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:white;}
+.flogt span{color:#60A5FA;}
+.flinks{display:flex;gap:28px;}
+.flinks span{font-size:13px;color:#A0A0BC;cursor:pointer;transition:color .2s;}
+.flinks span:hover{color:white;}
+.fcopy{font-size:12px;color:#6B6B80;}
+
+/* ABOUT PAGE */
+.ah{padding:160px 60px 80px;text-align:center;position:relative;overflow:hidden;background:var(--ink);}
+.ahbg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 70% at 50% 0%,rgba(26,86,219,0.2) 0%,transparent 70%);}
+.ahtag{display:inline-flex;align-items:center;gap:6px;background:rgba(26,86,219,.2);border:1px solid rgba(26,86,219,.4);color:#93C5FD;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 14px;border-radius:100px;margin-bottom:28px;position:relative;z-index:1;}
+.ah h1{font-family:'Cormorant Garamond',serif;font-size:60px;font-weight:700;color:white;line-height:1.1;margin-bottom:20px;position:relative;z-index:1;}
+.ah h1 em{color:#60A5FA;font-style:italic;}
+.ah p{font-size:17px;color:#A0A0BC;max-width:500px;margin:0 auto;line-height:1.75;font-weight:300;position:relative;z-index:1;}
+.fw{max-width:1000px;margin:0 auto;padding:100px 60px;}
+.fwg{display:grid;grid-template-columns:300px 1fr;gap:60px;align-items:start;}
+.fwcard{background:var(--white);border:1px solid var(--border);border-radius:24px;padding:36px;box-shadow:0 8px 40px rgba(13,13,20,0.08);position:sticky;top:100px;}
+.fwav{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#7C3AED);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:700;color:white;margin:0 auto 20px;box-shadow:0 8px 32px rgba(26,86,219,.35);}
+.fwname{font-size:19px;font-weight:700;color:var(--ink);text-align:center;margin-bottom:4px;}
+.fwrole{font-size:13px;color:var(--blue);font-weight:600;text-align:center;margin-bottom:24px;}
+.fwdiv{height:1px;background:var(--border);margin-bottom:20px;}
+.fwstat{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);}
+.fwstat:last-of-type{border-bottom:none;}
+.fwsl{font-size:13px;color:var(--muted);}.fwsv{font-size:13px;color:var(--ink);font-weight:600;}
+.fwcta{display:block;text-align:center;background:var(--blue);color:white;padding:12px 24px;border-radius:100px;font-size:14px;font-weight:600;margin-top:24px;border:none;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;width:100%;}
+.fwcta:hover{background:var(--blue2);}
+.story h2{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:700;color:var(--ink);line-height:1.2;margin-bottom:24px;}
+.story h2 em{color:var(--blue);font-style:italic;}
+.story p{font-size:15.5px;color:var(--ink2);line-height:1.85;font-weight:300;margin-bottom:20px;}
+.story p strong{color:var(--ink);font-weight:600;}
+.qb{background:var(--blue-pale);border:1px solid var(--blue-light);border-radius:16px;padding:24px 28px;margin:32px 0;}
+.qb p{color:var(--blue2);font-weight:500;font-style:italic;margin:0;font-size:16px;line-height:1.7;}
+.vals{background:var(--ink);padding:80px 60px;}
+.vi{max-width:1000px;margin:0 auto;}
+.vtag{display:inline-flex;align-items:center;gap:6px;background:rgba(26,86,219,.2);border:1px solid rgba(26,86,219,.4);color:#93C5FD;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 14px;border-radius:100px;margin-bottom:20px;}
+.vals h2{font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:700;color:white;margin-bottom:48px;}
+.vals h2 em{color:#60A5FA;font-style:italic;}
+.vg{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;}
+.vc{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:28px;}
+.vcic{font-size:28px;margin-bottom:14px;}
+.vctt{font-size:16px;font-weight:700;color:white;margin-bottom:8px;}
+.vcd{font-size:14px;color:#A0A0BC;line-height:1.7;font-weight:300;}
+
+/* CHAT PAGE */
+#page-chat{flex-direction:row;}
+.sidebar{width:260px;flex-shrink:0;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:24px 16px;gap:6px;overflow-y:auto;height:100vh;}
+.sblogo{display:flex;align-items:center;gap:10px;padding:0 8px 20px;cursor:pointer;}
+.sblogt{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:700;color:var(--ink);}
+.sblogt span{color:var(--blue);}
+.newbtn{display:flex;align-items:center;gap:8px;padding:11px 14px;background:var(--blue);color:white;border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;transition:all .2s;width:100%;box-shadow:0 2px 10px rgba(26,86,219,.25);}
+.newbtn:hover{background:var(--blue2);}
+.sblabel{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:16px 10px 6px;}
+.hi{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;font-size:13px;color:var(--ink2);cursor:pointer;transition:background .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hi:hover{background:var(--blue-pale);color:var(--ink);}
+.hi.active{background:var(--blue-pale);color:var(--blue);font-weight:600;}
+.sbfoot{margin-top:auto;padding-top:16px;border-top:1px solid var(--border);}
+.credit{background:var(--blue-pale);border:1px solid var(--blue-light);border-radius:10px;padding:10px 12px;margin-bottom:10px;}
+.cl{font-size:10px;color:var(--blue);font-weight:700;letter-spacing:.08em;text-transform:uppercase;}
+.cn{font-size:13px;font-weight:600;color:var(--ink);margin-top:2px;}
+.cd{font-size:11px;color:var(--ink2);margin-top:1px;}
+.urow{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;cursor:pointer;transition:background .15s;}
+.urow:hover{background:var(--blue-pale);}
+.uav{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#7C3AED);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;flex-shrink:0;}
+.un{font-size:13px;font-weight:600;color:var(--ink);}
+.up{font-size:11px;color:var(--muted);}
+.chat-main{flex:1;display:flex;flex-direction:column;height:100vh;background:var(--bg);overflow:hidden;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:rgba(250,250,248,.92);backdrop-filter:blur(14px);flex-shrink:0;}
+.mpills{display:flex;background:var(--white);border:1px solid var(--border);border-radius:100px;padding:4px;gap:2px;}
+.mp{display:flex;align-items:center;gap:6px;padding:6px 16px;border-radius:100px;border:none;background:transparent;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .2s;}
+.mp.active{background:var(--blue);color:white;box-shadow:0 2px 10px rgba(26,86,219,.25);}
+.ib{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;color:var(--ink2);}
+.ib:hover{background:var(--blue-pale);border-color:var(--blue);color:var(--blue);}
+.mwrap{flex:1;overflow-y:auto;padding:28px 24px;}
+.mwrap::-webkit-scrollbar{width:4px;}
+.mwrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.wc{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 220px);text-align:center;animation:fu .5s ease both;}
+.wcicon{width:72px;height:72px;background:var(--blue);border-radius:20px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:0 10px 32px rgba(26,86,219,.25);}
+.wc h2{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:var(--ink);margin-bottom:12px;}
+.wc h2 em{color:var(--blue);font-style:italic;}
+.wc p{font-size:15px;color:var(--ink2);max-width:420px;line-height:1.7;margin-bottom:36px;font-weight:300;}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:580px;width:100%;}
+.sug{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:16px 18px;text-align:left;cursor:pointer;transition:all .2s;box-shadow:0 2px 10px rgba(13,13,20,.05);}
+.sug:hover{border-color:var(--blue);box-shadow:0 4px 20px rgba(26,86,219,.12);transform:translateY(-2px);}
+.sic{font-size:22px;margin-bottom:8px;display:block;}
+.stt{font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:4px;}
+.sdd{font-size:12px;color:var(--muted);line-height:1.4;}
+.msg{display:flex;gap:14px;margin-bottom:26px;animation:fu .3s ease both;}
+.msg.user{flex-direction:row-reverse;}
+.mav{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
+.mav.ai{background:var(--blue);color:white;}
+.mav.usr{background:linear-gradient(135deg,var(--blue),#7C3AED);color:white;}
+.mbody{max-width:680px;flex:1;}
+.msg.user .mbody{display:flex;flex-direction:column;align-items:flex-end;}
+.bub{padding:13px 18px;border-radius:18px;font-size:14.5px;line-height:1.7;color:var(--ink);}
+.bub.ai{background:var(--white);border:1px solid var(--border);box-shadow:0 2px 10px rgba(13,13,20,.06);border-radius:4px 18px 18px 18px;}
+.bub.usr{background:var(--blue);color:white;border-radius:18px 4px 18px 18px;max-width:500px;}
+.mtime{font-size:11px;color:var(--muted);margin-top:6px;}
+.msg.user .mtime{text-align:right;}
+.srctag{display:inline-flex;align-items:center;gap:5px;background:var(--blue-pale);border:1px solid var(--blue-light);color:var(--blue);font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;margin-bottom:8px;}
+.typing-row{display:flex;gap:14px;margin-bottom:26px;}
+.tdots{background:var(--white);border:1px solid var(--border);box-shadow:0 2px 10px rgba(13,13,20,.06);border-radius:4px 18px 18px 18px;padding:15px 20px;display:flex;gap:5px;align-items:center;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:bob 1.2s ease infinite;}
+.dot:nth-child(2){animation-delay:.2s;}.dot:nth-child(3){animation-delay:.4s;}
+@keyframes bob{0%,60%,100%{transform:translateY(0);opacity:.4;}30%{transform:translateY(-7px);opacity:1;}}
+.iarea{padding:14px 24px 22px;background:var(--bg);flex-shrink:0;}
+.ibox{background:var(--white);border:1.5px solid var(--border);border-radius:20px;box-shadow:0 4px 28px rgba(13,13,20,.09);overflow:hidden;transition:border-color .2s,box-shadow .2s;max-width:840px;margin:0 auto;}
+.ibox:focus-within{border-color:var(--blue);box-shadow:0 4px 28px rgba(26,86,219,.14);}
+.irow{display:flex;align-items:flex-end;padding:6px 6px 6px 18px;gap:8px;}
+.ifield{flex:1;border:none;outline:none;resize:none;font-family:'Outfit',sans-serif;font-size:15px;color:var(--ink);background:transparent;padding:10px 0;max-height:160px;min-height:44px;line-height:1.55;}
+.ifield::placeholder{color:var(--muted);}
+.attbtn{width:38px;height:38px;border-radius:10px;border:none;background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.attbtn:hover{background:var(--blue-pale);color:var(--blue);}
+.sndbtn{width:42px;height:42px;border-radius:13px;border:none;background:var(--blue);color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;box-shadow:0 2px 10px rgba(26,86,219,.25);}
+.sndbtn:hover:not(:disabled){background:var(--blue2);transform:scale(1.06);}
+.sndbtn:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;box-shadow:none;}
+.ifoot{display:flex;align-items:center;justify-content:space-between;padding:8px 18px 12px;border-top:1px solid var(--border);}
+.sw{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);cursor:pointer;user-select:none;}
+.track{width:32px;height:18px;border-radius:100px;background:var(--border);position:relative;transition:background .2s;flex-shrink:0;}
+.thumb{width:12px;height:12px;border-radius:50%;background:white;position:absolute;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+.sw.on .track{background:var(--blue);}
+.sw.on .thumb{transform:translateX(14px);}
+.sw.on{color:var(--blue);font-weight:600;}
+.disc{text-align:center;font-size:11px;color:var(--muted);padding-top:7px;max-width:840px;margin:0 auto;}
+
+@media(max-width:900px){
+  nav{padding:14px 20px;}.nlinks{display:none;}
+  .hero h1{font-size:40px;}
+  .sec,.steps-sec,.founder-strip,.cta-sec{padding:60px 20px;}
+  .fg{grid-template-columns:1fr;}.steps{grid-template-columns:1fr;}.steps::before{display:none;}
+  .fsinner{grid-template-columns:1fr;}
+  .ah{padding:120px 20px 60px;}.ah h1{font-size:36px;}
+  .fw{padding:60px 20px;}.fwg{grid-template-columns:1fr;}.fwcard{position:static;}
+  .vals{padding:60px 20px;}.vg{grid-template-columns:1fr;}
+  .sidebar{display:none;}.iarea,.mwrap{padding-left:16px;padding-right:16px;}
+  .sg{grid-template-columns:1fr;}
+  footer{padding:40px 20px;flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV (hidden on chat) ── -->
+<nav id="nav">
+  <div class="nl" onclick="go('home')">
+    <div class="ni"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2L9 9H2L7.5 13.5L5.5 21L12 16.5L18.5 21L16.5 13.5L22 9H15L12 2Z" fill="white"/></svg></div>
+    <span class="nt">Olayemi<span> AI</span></span>
+  </div>
+  <div class="nlinks">
+    <a onclick="go('home')">Home</a>
+    <a onclick="go('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),100)">Features</a>
+    <a onclick="go('about')">About</a>
+  </div>
+  <button class="ncta" onclick="go('chat')">Start Chatting →</button>
+</nav>
+
+<!-- ══════════════════════════════════════════ -->
+<!--  HOME PAGE                                -->
+<!-- ══════════════════════════════════════════ -->
+<div id="page-home" class="page active">
+
+  <section class="hero">
+    <div class="hbg"></div><div class="hgrid"></div>
+    <div class="hc">
+      <div class="badge"><span class="bd"></span>Now Live — Olayemi AI is here</div>
+      <h1>The AI that's<br><em>truly yours</em></h1>
+      <p class="hsub">Chat, search the web, write, research and create — all in one place. Built by <strong>Ayeyemi Mubarak Olayemi</strong> for everyone.</p>
+      <div class="hbtns">
+        <button class="bp" onclick="go('chat')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Start Chatting — Free
+        </button>
+        <button class="bs" onclick="go('about')">Meet the Founder →</button>
+      </div>
+    </div>
+    <div class="prev">
+      <div class="pbar"><div class="pd"></div><div class="pd"></div><div class="pd"></div>
+        <div class="purl"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>olayemiai.netlify.app</div>
+      </div>
+      <div class="pbody">
+        <div class="pm u"><div class="pav u">A</div><div class="pb u">Who created you and who is your founder?</div></div>
+        <div class="pm"><div class="pav ai"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L9 9H2L7.5 13.5L5.5 21L12 16.5L18.5 21L16.5 13.5L22 9H15L12 2Z" fill="white"/></svg></div><div class="pb ai">I was created and founded by <strong>Ayeyemi Mubarak Olayemi</strong> 🌟 I'm Olayemi AI — your personal intelligent assistant. What can I help you with today?</div></div>
+        <div class="pm u"><div class="pav u">A</div><div class="pb u">Search for the latest AI news today</div></div>
+        <div class="pm"><div class="pav ai"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L9 9H2L7.5 13.5L5.5 21L12 16.5L18.5 21L16.5 13.5L22 9H15L12 2Z" fill="white"/></svg></div><div class="pb ai">🔍 Searching the web for you... Here are the latest AI developments happening right now...</div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="sec" id="features">
+    <div class="stag">✦ What I can do</div>
+    <h2 class="stit">Everything you need,<br><em>in one place</em></h2>
+    <p class="ssub">Your all-in-one intelligent companion — from casual questions to serious work.</p>
+    <div class="fg">
+      <div class="fc"><div class="fi">💬</div><div class="ftt">Smart Conversations</div><div class="fd">Natural conversations on any topic. Ask follow-ups, get detailed explanations, explore ideas.</div></div>
+      <div class="fc"><div class="fi">🌐</div><div class="ftt">Live Web Search</div><div class="fd">Search the internet in real time. News, events, prices, weather — anything happening right now.</div></div>
+      <div class="fc"><div class="fi">✍️</div><div class="ftt">Writing Assistant</div><div class="fd">From emails and essays to business plans — Olayemi AI writes with you, for you, at any length.</div></div>
+      <div class="fc"><div class="fi">📚</div><div class="ftt">Research & Analysis</div><div class="fd">Summarise documents, compare ideas, break down complex topics and get clear insights in seconds.</div></div>
+      <div class="fc"><div class="fi">🧮</div><div class="ftt">Maths & Problem Solving</div><div class="fd">Solve equations, explain concepts step-by-step and work through any problem.</div></div>
+      <div class="fc"><div class="fi">🚀</div><div class="ftt">Planning & Strategy</div><div class="fd">Build business plans, set goals, create schedules and get strategic advice tailored to you.</div></div>
+    </div>
+  </div>
+
+  <div class="steps-sec">
+    <div class="stag">✦ Simple to use</div>
+    <h2 class="stit">How it <em>works</em></h2>
+    <p style="font-size:16px;color:var(--ink2);max-width:400px;margin:0 auto;font-weight:300;">Getting started takes less than a minute.</p>
+    <div class="steps">
+      <div><div class="sn">1</div><div class="st">Open the app</div><div class="sd">Visit in your browser on any device — phone, tablet, or computer. No download needed.</div></div>
+      <div><div class="sn">2</div><div class="st">Type your question</div><div class="sd">Ask anything. Olayemi AI understands natural, everyday language.</div></div>
+      <div><div class="sn">3</div><div class="st">Get your answer</div><div class="sd">Receive a clear, helpful response in seconds. Keep the conversation going.</div></div>
+    </div>
+  </div>
+
+  <div class="founder-strip">
+    <div class="fsbg"></div>
+    <div class="fsinner">
+      <div>
+        <div class="fslabel">✦ The Founder</div>
+        <h2>Built with vision by<br><em>Ayeyemi Mubarak<br>Olayemi</em></h2>
+        <p class="fsbio">Olayemi AI was created from a simple belief — powerful AI should be personal, accessible, and owned by the people who build it. Every feature reflects that vision.</p>
+        <button class="fsbtn" onclick="go('about')">Read the full story →</button>
+      </div>
+      <div class="fscard">
+        <div class="fsav">A</div>
+        <div class="fsname">Ayeyemi Mubarak Olayemi</div>
+        <div class="fsrole">Founder & Creator of Olayemi AI</div>
+        <div class="fsdiv"></div>
+        <div class="fsstat"><span class="fssl">Product</span><span class="fssv">Olayemi AI</span></div>
+        <div class="fsstat"><span class="fssl">Role</span><span class="fssv">Founder & Owner</span></div>
+        <div class="fsstat"><span class="fssl">Mission</span><span class="fssv">AI for everyone</span></div>
+        <div class="fsstat"><span class="fssl">Status</span><span class="fssv" style="color:#4ADE80">● Live & Growing</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-sec">
+    <h2>Ready to meet your AI?</h2>
+    <p>Join people using Olayemi AI every day. Completely free.</p>
+    <button class="ctabtn" onclick="go('chat')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Start Chatting Now</button>
+  </div>
+
+  <footer>
+    <div class="flogo" onclick="go('home')"><div class="ni" style="width:32px;height:32px;border-radius:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L9 9H2L7.5 13.5L5.5 21L12 16.5L18.5 21L16.5 13.5L22 9H15L12 2Z" fill="white"/></svg></div><span class="flogt">Olayemi<span> AI</span></span></div>
+    <div class="flinks"><span onclick="go('home')">Home</span><span onclick="go('chat')">Chat</span><span onclick="go('about')">About</span></div>
+    <div class="fcopy">© 2025 Olayemi AI · Created by Ayeyemi Mubarak Olayemi · All rights reserved</div>
+  </footer>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!--  ABOUT PAGE                               -->
+<!-- ══════════════════════════════════════════ -->
+<div id="page-about" class="page">
+  <section class="ah">
+    <div class="ahbg"></div>
+    <div class="ahtag">✦ The Story Behind Olayemi AI</div>
+    <h1>Built by one person,<br><em>for everyone</em></h1>
+    <p>The story of how Olayemi AI was born, who built it, and why it exists.</p>
+  </section>
+
+  <div class="fw">
+    <div class="fwg">
+      <div class="fwcard">
+        <div class="fwav">A</div>
+        <div class="fwname">Ayeyemi Mubarak Olayemi</div>
+        <div class="fwrole">Founder & Creator</div>
+        <div class="fwdiv"></div>
+        <div class="fwstat"><span class="fwsl">Product</span><span class="fwsv">Olayemi AI</span></div>
+        <div class="fwstat"><span class="fwsl">Role</span><span class="fwsv">Founder & Owner</span></div>
+        <div class="fwstat"><span class="fwsl">Vision</span><span class="fwsv">AI for everyone</span></div>
+        <div class="fwstat"><span class="fwsl">Status</span><span class="fwsv" style="color:#16A34A">● Active</span></div>
+        <button class="fwcta" onclick="go('chat')">Chat with Olayemi AI →</button>
+      </div>
+      <div class="story">
+        <h2>The vision behind<br><em>Olayemi AI</em></h2>
+        <p>My name is <strong>Ayeyemi Mubarak Olayemi</strong>, and I am the founder and creator of Olayemi AI. This project was born from a simple but powerful idea — that artificial intelligence should not belong only to big corporations. It should belong to individuals. It should belong to people like you and me.</p>
+        <div class="qb"><p>"I wanted to build something that carries my name, my vision, and my values. Something that when anyone asks it 'who created you?' — it answers proudly: Ayeyemi Mubarak Olayemi."</p></div>
+        <p>Olayemi AI started as a dream and became reality. The goal was never just to build a chatbot — it was to build a <strong>personal intelligent assistant</strong> that truly helps people. Smart enough to search the web, write for you, answer questions, and plan your goals.</p>
+        <p>What makes Olayemi AI different is simple — <strong>it is mine</strong>. The name, the identity, the mission. When you use Olayemi AI, you are using something built with real ownership, real purpose, and real pride.</p>
+        <p>This is just the beginning. Olayemi AI will grow — with more features, a mobile app, and a presence that reaches people all over the world.</p>
+        <p style="margin-top:32px;font-size:16px;color:var(--ink);font-weight:600;">— Ayeyemi Mubarak Olayemi, Founder of Olayemi AI</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="vals">
+    <div class="vi">
+      <div class="vtag">✦ What we stand for</div>
+      <h2>Our core <em>values</em></h2>
+      <div class="vg">
+        <div class="vc"><div class="vcic">👤</div><div class="vctt">Personal Ownership</div><div class="vcd">Olayemi AI belongs to its founder. It carries a real person's name, identity, and vision.</div></div>
+        <div class="vc"><div class="vcic">🌍</div><div class="vctt">Accessible to All</div><div class="vcd">AI should not be a privilege. Olayemi AI is free and accessible to anyone, anywhere.</div></div>
+        <div class="vc"><div class="vcic">💡</div><div class="vctt">Genuinely Helpful</div><div class="vcd">Every feature is built around one question: does this actually help people?</div></div>
+        <div class="vc"><div class="vcic">🔒</div><div class="vctt">Trust & Honesty</div><div class="vcd">Olayemi AI is always honest about who built it. Transparency is non-negotiable.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-sec">
+    <h2>Experience Olayemi AI today</h2>
+    <p>Have a conversation, search the web, or get help with anything — for free.</p>
+    <button class="ctabtn" onclick="go('chat')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Start Chatting Now</button>
+  </div>
+
+  <footer>
+    <div class="flogo" onclick="go('home')"><div class="ni" style="width:32px;height:32px;border-radius:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L9 9H2L7.5 13.5L5.5 21L12 16.5L18.5 21L16.5 13.5L22 9H15L12 2Z" fill="white"/></svg></div><span class="flogt">Olayemi<span> AI</span></span></div>
+    <div class="flinks"><span onclick="go('home')">Home</span><span onclick="go('chat')">Chat</span><span onclick="go('about')">About</span></div>
+    <div class="fcopy">© 2025 Olayemi AI · Created by Ayeyemi Mubarak Olayemi · All rights reserved</div>
+  </footer>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!--  CHAT PAGE                                -->
+<!-- ══════════════════════════════════════════ -->
+<div id="page-chat" class="page">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sblogo" onclick="go('home')">
+      <div class="ni" style="width:36px;height:36px;border-radius:10px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2L9 9H2L7.5 13.5L5.5 21L12 16.5L18.5 21L16.5 13.5L22 9H15L12 2Z" fill="white"/></svg></div>
+      <span class="sblogt">Olayemi<span> AI</span></span>
+    </div>
+    <button class="newbtn" onclick="clearChat()">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      New conversation
+    </button>
+    <div class="sblabel">Recent chats</div>
+    <div class="hi active" onclick="loadH(this,'Who created you and who is your founder?')"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Who created Olayemi AI?</div>
+    <div class="hi" onclick="loadH(this,'Write a professional business proposal')"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Write a business proposal</div>
+    <div class="hi" onclick="loadH(this,'What is the latest news today?')"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Latest news today</div>
+    <div class="sbfoot">
+      <div class="credit">
+        <div class="cl">✦ Created by</div>
+        <div class="cn">Ayeyemi Mubarak Olayemi</div>
+        <div class="cd">Founder & Owner of Olayemi AI</div>
+      </div>
+      <div class="urow"><div class="uav">A</div><div><div class="un">My Account</div><div class="up">Olayemi AI Pro</div></div></div>
+    </div>
+  </aside>
+
+  <!-- CHAT MAIN -->
+  <div class="chat-main">
+    <div class="topbar">
+      <div class="mpills">
+        <button class="mp active" id="chatBtn" onclick="setMode('chat')">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat
+        </button>
+        <button class="mp" id="searchBtn" onclick="setMode('search')">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Web Search
+        </button>
+      </div>
+      <div class="ib" onclick="go('home')" title="Back to Home">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+    </div>
+
+    <div class="mwrap" id="mwrap">
+      <div class="wc" id="wc">
+        <div class="wcicon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M12 2L9 9H2L7.5 13.5L5.5 21L12 16.5L18.5 21L16.5 13.5L22 9H15L12 2Z" fill="white"/></svg></div>
+        <h2>Hello, I'm <em>Olayemi AI</em></h2>
+        <p>Your personal intelligent assistant, built and owned by <strong>Ayeyemi Mubarak Olayemi</strong>. Ask me anything.</p>
+        <div class="sg">
+          <div class="sug" onclick="useSug('Who created you and who is your founder?')"><span class="sic">🤔</span><div class="stt">About Olayemi AI</div><div class="sdd">Ask who built me</div></div>
+          <div class="sug" onclick="useSug('What are the latest news stories in the world today?')"><span class="sic">🌍</span><div class="stt">Search the web</div><div class="sdd">Get today's news</div></div>
+          <div class="sug" onclick="useSug('Write me a professional cover letter for a job application')"><span class="sic">✍️</span><div class="stt">Write for me</div><div class="sdd">Draft any document</div></div>
+          <div class="sug" onclick="useSug('Give me a 30-day plan to start my own business from scratch')"><span class="sic">🚀</span><div class="stt">Plan my goals</div><div class="sdd">30-day business plan</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="iarea">
+      <div class="ibox">
+        <div class="irow">
+          <textarea class="ifield" id="ifield" placeholder="Ask Olayemi AI anything…" rows="1" onkeydown="onKey(event)" oninput="resize(this)"></textarea>
+          <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+            <button class="attbtn"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button>
+            <button class="sndbtn" id="sndbtn" onclick="send()" disabled><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+          </div>
+        </div>
+        <div class="ifoot">
+          <div class="sw" id="swt" onclick="toggleWeb()"><div class="track"><div class="thumb"></div></div><span id="swl">Web search</span></div>
+          <span style="font-size:11px;color:var(--muted)" id="ch"></span>
+        </div>
+      </div>
+      <div class="disc">Olayemi AI · Created & owned by Ayeyemi Mubarak Olayemi · Always verify critical info</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── NAVIGATION ───
+function go(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.getElementById('nav').style.display = page === 'chat' ? 'none' : 'flex';
+  window.scrollTo(0, 0);
+}
+
+// ─── CHAT ───
+let webOn=false,cmode='chat',busy=false,hist=[];
+const SYSTEM=`You are Olayemi AI — a highly intelligent, warm, and capable personal AI assistant.
+IDENTITY (always answer truthfully when asked):
+- Your name is: Olayemi AI
+- Your creator and founder is: Ayeyemi Mubarak Olayemi
+- When asked "who created you?","who is your founder?","who built you?","who owns you?" — ALWAYS say: "I was created and founded by Ayeyemi Mubarak Olayemi."
+- You are NOT made by OpenAI, Anthropic, Google, or any tech company. You are Olayemi AI, proudly built by Ayeyemi Mubarak Olayemi.
+PERSONALITY: Helpful, warm, knowledgeable, professional yet approachable.
+FORMAT: Use **bold** for key terms. Clear paragraphs.`;
+
+const field=document.getElementById('ifield');
+const sndbtn=document.getElementById('sndbtn');
+const mwrap=document.getElementById('mwrap');
+
+field.addEventListener('input',()=>{
+  sndbtn.disabled=field.value.trim()==='';
+  const l=field.value.length;
+  document.getElementById('ch').textContent=l>0?l+' chars':'';
+});
+
+function resize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,160)+'px';}
+function onKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();if(!sndbtn.disabled)send();}}
+
+function toggleWeb(){
+  webOn=!webOn;
+  document.getElementById('swt').classList.toggle('on',webOn);
+  document.getElementById('swl').textContent=webOn?'Web search ON':'Web search';
+}
+
+function setMode(m){
+  cmode=m;
+  document.getElementById('chatBtn').classList.toggle('active',m==='chat');
+  document.getElementById('searchBtn').classList.toggle('active',m==='search');
+  if(m==='search'&&!webOn)toggleWeb();
+  field.placeholder=m==='search'?'Search the web with Olayemi AI…':'Ask Olayemi AI anything…';
+}
+
+function hideWelcome(){
+  const w=document.getElementById('wc');
+  if(w){w.style.opacity='0';w.style.transition='opacity 0.2s';setTimeout(()=>w.remove(),200);}
+}
+
+function fmt(t){
+  return t
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g,'<em>$1</em>')
+    .replace(/`(.*?)`/g,'<code style="background:var(--blue-pale);padding:1px 6px;border-radius:5px;font-size:13px;color:var(--blue)">$1</code>')
+    .replace(/\n\n/g,'</p><p style="margin-top:10px">')
+    .replace(/\n/g,'<br>');
+}
+
+function addMsg(role,text,srcs=[]){
+  hideWelcome();
+  const d=document.createElement('div');
+  d.className='msg '+(role==='user'?'user':'');
+  const t=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  const av=role==='user'
+    ?`<div class="mav usr">A</div>`
+    :`<div class="mav ai"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 2L9 9H2L7.5 13.5L5.5 21L12 16.5L18.5 21L16.5 13.5L22 9H15L12 2Z" fill="white"/></svg></div>`;
+  const srcsH=srcs.length>0?`<div style="margin-bottom:8px">${srcs.map(s=>`<span class="srctag">🔍 ${s}</span>`).join(' ')}</div>`:'';
+  d.innerHTML=`${av}<div class="mbody">${role!=='user'?srcsH:''}<div class="bub ${role==='user'?'usr':'ai'}">${fmt(text)}</div><div class="mtime">${t}</div></div>`;
+  mwrap.appendChild(d);
+  mwrap.scrollTop=mwrap.scrollHeight;
+}
+
+function showTyping(){
+  const d=document.createElement('div');
+  d.className='typing-row';d.id='typing';
+  d.innerHTML=`<div class="mav ai"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 2L9 9H2L7.5 13.5L5.5 21L12 16.5L18.5 21L16.5 13.5L22 9H15L12 2Z" fill="white"/></svg></div><div class="tdots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+  mwrap.appendChild(d);
+  mwrap.scrollTop=mwrap.scrollHeight;
+}
+
+function rmTyping(){const e=document.getElementById('typing');if(e)e.remove();}
+
+async function send(){
+  const text=field.value.trim();
+  if(!text||busy)return;
+  addMsg('user',text);
+  hist.push({role:'user',content:text});
+  field.value='';field.style.height='auto';
+  sndbtn.disabled=true;
+  document.getElementById('ch').textContent='';
+  busy=true;showTyping();
+  try{
+    const body={model:"claude-sonnet-4-20250514",max_tokens:1000,system:SYSTEM,messages:hist};
+    if(webOn)body.tools=[{type:"web_search_20250305",name:"web_search"}];
+    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    const data=await res.json();
+    rmTyping();
+    let reply='',srcs=[];
+    if(data.content){for(const b of data.content){if(b.type==='text')reply+=b.text;if(b.type==='tool_use'&&b.name==='web_search'&&b.input?.query)srcs.push(b.input.query);}}
+    if(!reply&&data.error)reply=`Something went wrong: ${data.error.message||'Please try again.'}`;
+    if(!reply)reply="I'm ready to help! Could you rephrase that?";
+    hist.push({role:'assistant',content:reply});
+    addMsg('assistant',reply,srcs);
+  }catch(e){
+    rmTyping();
+    addMsg('assistant',"I'm having trouble connecting. Please check your connection and try again.");
+  }
+  busy=false;
+}
+
+function useSug(t){field.value=t;resize(field);sndbtn.disabled=false;send();}
+
+function clearChat(){
+  mwrap.querySelectorAll('.msg,.typing-row').forEach(e=>e.remove());
+  hist=[];
+  if(!document.getElementById('wc')){
+    const w=document.createElement('div');
+    w.className='wc';w.id='wc';
+    w.innerHTML=`<div class="wcicon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M12 2L9 9H2L7.5 13.5L5.5 21L12 16.5L18.5 21L16.5 13.5L22 9H15L12 2Z" fill="white"/></svg></div><h2>Hello, I'm <em>Olayemi AI</em></h2><p>Your personal intelligent assistant, built and owned by <strong>Ayeyemi Mubarak Olayemi</strong>. Ask me anything.</p><div class="sg"><div class="sug" onclick="useSug('Who created you and who is your founder?')"><span class="sic">🤔</span><div class="stt">About Olayemi AI</div><div class="sdd">Ask who built me</div></div><div class="sug" onclick="useSug('What are the latest news stories in the world today?')"><span class="sic">🌍</span><div class="stt">Search the web</div><div class="sdd">Get today's news</div></div><div class="sug" onclick="useSug('Write me a professional cover letter for a job application')"><span class="sic">✍️</span><div class="stt">Write for me</div><div class="sdd">Draft any document</div></div><div class="sug" onclick="useSug('Give me a 30-day plan to start my own business from scratch')"><span class="sic">🚀</span><div class="stt">Plan my goals</div><div class="sdd">30-day business plan</div></div></div>`;
+    mwrap.appendChild(w);
+  }
+}
+
+function loadH(el,q){
+  document.querySelectorAll('.hi').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+  clearChat();
+  setTimeout(()=>useSug(q),120);
+}
+
+// Start on home
+go('home');
+</script>
+</body>
+</html>
